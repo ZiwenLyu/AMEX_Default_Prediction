@@ -37,6 +37,7 @@ We could see that over 80% of customers have 13 statements in both datasets. We 
 ![The default status distribution in categorical features](https://github.com/ZiwenLyu/AMEX_Default_Prediction/blob/main/graphs/default%20status%20distribution%20in%20categorical%20features.png)
 
 ### The defaul status distribution in numeric features
+As the graphs show, for some variables (such as P_2, D_55) the default and paid distributions vary a lot.
 ![The defaul status distribution in numeric features](https://github.com/ZiwenLyu/AMEX_Default_Prediction/blob/main/graphs/default%20status%20distribution%20in%20num%20features.png)
 ![The defaul status distribution in numeric features2](https://github.com/ZiwenLyu/AMEX_Default_Prediction/blob/main/graphs/default%20status%20distribution%20in%20num%20features2.png)
 ![The defaul status distribution in numeric features3](https://github.com/ZiwenLyu/AMEX_Default_Prediction/blob/main/graphs/default%20status%20distribution%20in%20num%20features3.png)
@@ -49,4 +50,34 @@ We could see that over 80% of customers have 13 statements in both datasets. We 
 ![The defaul status distribution in numeric features10](https://github.com/ZiwenLyu/AMEX_Default_Prediction/blob/main/graphs/default%20status%20distribution%20in%20num%20features10.png)
 ![The defaul status distribution in numeric features11](https://github.com/ZiwenLyu/AMEX_Default_Prediction/blob/main/graphs/default%20status%20distribution%20in%20num%20features11.png)
 
-As the graphs show, for some variables (such as P_2, D_55) the default and paid distributions vary a lot.
+## Study Missing Values
+### Null distribution per row
+Both train and test datasets contain variables with high portions of missing values. Let's check the distribution of nulls and see if values are missed randomly or highly-correlated with the default status.
+![The defaul status distribution in numeric features11](https://github.com/ZiwenLyu/AMEX_Default_Prediction/blob/main/graphs/number%20of%20null%20values%20by%20default%20status%20(train).png)
+In the train dataset: We can learn from the result that the default curve tends to skew left, compared to the non-default curve, which means rows with less null values are more likely to have defaults. And we also can see that rows with 15-22 null values contain more targets "default." Adding "number of null values per row" as a feature to our dataset will help the model to better predict. It seems null values are informative to the classifier.
+### Correlations of default status and columns with null values
+![Correlations of default status and columns with null values]()
+From the chart we can see that, the correlation of the target and columns which contain null values ranges from -0.61 to 0.55. Variable D_87 seems not to be correlated with the target, so we can drop D_87. Though other features have a huge amount of nulls, they matter to the target status to some extent and we need them to predict default status.
+
+## Data Preprocess
+Since we need to predict default probability of each customer and we have their multiple statements, statements are aggregated into one piece per customer. Numeric variables of several statements will be aggregated into one by means, standard deviation, min, max, and last. Categorical variables will be aggregated by their counts, last number, countss of non-null unique values.
+Though each categorical feature has less than 10 unique values, the train dataset already has more than 100 columns and we adopt labelencoder rather than onehotencoding.
+
+## Machine Learning: LightGBM Classifier
+Considered the huge amount of data the model will process, the proportion of missing values we need to preserve, as well as some of the outliers seen in the distributions, here I will choose LightGBM.
+
+The evaluation metric, `M`, for this competition is the mean of two measures of rank ordering: Normalized Gini Coefficient, `G`, and default rate captured at 4%, `D`.
+
+`M = 0.5⋅(G+D)`
+
+The default rate captured at 4% is the percentage of the positive labels (defaults) captured within the highest-ranked 4% of the predictions, and represents a Sensitivity/Recall statistic.
+For both of the sub-metrics `G` and `D`, the negative labels are given a weight of 20 to adjust for downsampling.
+
+This metric has a maximum value of 1.0.
+
+At first, I set a range of parameters and applied `optuna` to automatically choose parameters and run trials for the model. The model scored 0.7889. Then based on the suggested parameters, I manually adjust parameters and train the model. The validation scored 0.7922 by AMEX metric, reached an accuracy of 90.34%.
+
+![validation_score](https://github.com/ZiwenLyu/AMEX_Default_Prediction/blob/main/graphs/validation_score.png)
+
+## Importances Analysis
+
