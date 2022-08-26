@@ -79,5 +79,3 @@ At first, I set a range of parameters and applied `optuna` to automatically choo
 
 ![validation_score](https://github.com/ZiwenLyu/AMEX_Default_Prediction/blob/main/graphs/validation_score.png)
 
-## Importances Analysis
-
