@@ -56,7 +56,7 @@ Both train and test datasets contain variables with high portions of missing val
 ![The defaul status distribution in numeric features11](https://github.com/ZiwenLyu/AMEX_Default_Prediction/blob/main/graphs/number%20of%20null%20values%20by%20default%20status%20(train).png)
 In the train dataset: We can learn from the result that the default curve tends to skew left, compared to the non-default curve, which means rows with less null values are more likely to have defaults. And we also can see that rows with 15-22 null values contain more targets "default." Adding "number of null values per row" as a feature to our dataset will help the model to better predict. It seems null values are informative to the classifier.
 ### Correlations of default status and columns with null values
-![Correlations of default status and columns with null values]()
+![Correlations of default status and columns with null values](https://github.com/ZiwenLyu/AMEX_Default_Prediction/blob/main/graphs/Correlation%20of%20target%20and%20null%20columns.png)
 From the chart we can see that, the correlation of the target and columns which contain null values ranges from -0.61 to 0.55. Variable D_87 seems not to be correlated with the target, so we can drop D_87. Though other features have a huge amount of nulls, they matter to the target status to some extent and we need them to predict default status.
 
 ## Data Preprocess
@@ -78,4 +78,3 @@ This metric has a maximum value of 1.0.
 At first, I set a range of parameters and applied `optuna` to automatically choose parameters and run trials for the model. The model scored 0.7889. Then based on the suggested parameters, I manually adjust parameters and train the model. The validation scored 0.7922 by AMEX metric, reached an accuracy of 90.34%.
 
 ![validation_score](https://github.com/ZiwenLyu/AMEX_Default_Prediction/blob/main/graphs/validation_score.png)
-
